@@ -3,8 +3,7 @@ import time
 import numpy as np
 
 import torch
-import torch_tensorrt
-from distraction_model import DistractionModel
+from torch2trt.torch2trt import TRTModule
 import torch.backends.cudnn as cudnn
 
 cudnn.benchmark = True
@@ -12,19 +11,16 @@ cudnn.benchmark = True
 
 def main():
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    model = DistractionModel()
-    model.load_state_dict(torch.load('model.pth', map_location=device))
-    model.to(device)
-    model.eval()
+    model_trt = TRTModule()
+    model_trt.load_state_dict(torch.load('trt_model.pt', map_location=device))
+    model_trt.to(device)
+    model_trt.eval()
     print(device)
-    trt_model = torch_tensorrt.compile(model,
-                                       inputs=[torch_tensorrt.Input((1, 3, 224, 224))],
-                                       enabled_precisions={torch.half}  # Run with FP16
-                                       )
-    benchmark(trt_model, device, dtype='fp16')
+    shape = (1, 3, 480, 640)
+    benchmark(model_trt.half(), device, shape)
 
 
-def benchmark(model, device, input_shape=(1, 3, 224, 224), dtype='fp32', nwarmup=50, nruns=1000):
+def benchmark(model, device, input_shape, dtype='fp32', nwarmup=50, nruns=1000):
     input_data = torch.randn(input_shape)
     input_data = input_data.to(device)
     if dtype == 'fp16':
