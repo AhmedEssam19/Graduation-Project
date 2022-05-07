@@ -1,47 +1,32 @@
-import time
+import cv2 as cv
 
-import numpy as np
-
-import torch
-from torch2trt.torch2trt import TRTModule
-import torch.backends.cudnn as cudnn
-
-cudnn.benchmark = True
+from time import time
+from distraction_model import WrapperDistractionModel
 
 
 def main():
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    model_trt = TRTModule()
-    model_trt.load_state_dict(torch.load('trt_model.pt', map_location=device))
-    model_trt.to(device)
-    model_trt.eval()
-    print(device)
-    shape = (1, 3, 480, 640)
-    benchmark(model_trt.half(), device, shape)
+    distraction_capture = cv.VideoCapture(2)
+    distraction_model = WrapperDistractionModel()
+    last_attention = time()
+    while True:
+        _, frame = distraction_capture.read()
+        distraction_prediction = distraction_model.predict(frame)
+        print(distraction_prediction)
+        if distraction_prediction == 0:
+            last_attention = time()
 
+        else:
+            non_attention_interval = time() - last_attention
+            print(non_attention_interval)
+            if non_attention_interval > 4:
+                print("AUTO BREAK!!!!")
 
-def benchmark(model, device, input_shape, dtype='fp32', nwarmup=50, nruns=1000):
-    input_data = torch.randn(input_shape)
-    input_data = input_data.to(device)
-    if dtype == 'fp16':
-        input_data = input_data.half()
+            elif non_attention_interval > 2:
+                print("WARNING!!!")
 
-    print("Warm up ...")
-    with torch.no_grad():
-        for _ in range(nwarmup):
-            _ = model(input_data)
-    torch.cuda.synchronize()
-    print("Start timing ...")
-    timings = []
-    with torch.no_grad():
-        for i in range(1, nruns + 1):
-            start_time = time.time()
-            _ = model(input_data)
-            torch.cuda.synchronize()
-            end_time = time.time()
-            timings.append(end_time - start_time)
-            if i % 10 == 0:
-                print('Iteration %d/%d, avg batch time %.2f ms' % (i, nruns, np.mean(timings) * 1000))
+        cv.imshow("stream", frame)
+        if cv.waitKey(1) & 0xFF == ord('q'):
+            break
 
 
 if __name__ == "__main__":
