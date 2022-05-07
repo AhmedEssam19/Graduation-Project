@@ -39,7 +39,7 @@ class WrapperDistractionModel:
     def _preprocess(self, frame: np.ndarray):
         frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
         frame = self.transforms(frame)
-        frame = torch.unsqueeze(frame.float(), 0)
+        frame = torch.unsqueeze(frame, 0)
         frame = frame.to(self.device)
 
         return frame
