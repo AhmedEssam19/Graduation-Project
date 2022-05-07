@@ -1,26 +1,24 @@
+import torch
 import time
 
+import torch.backends.cudnn as cudnn
 import numpy as np
 
-import torch
-# from torch2trt.torch2trt import TRTModule
-import torch.backends.cudnn as cudnn
-
-cudnn.benchmark = True
+from torch2trt import torch2trt, TRTModule
 
 
-def main():
+def convert2trt(model: torch.nn.Module, shape: tuple) -> TRTModule:
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    model_trt = TRTModule()
-    model_trt.load_state_dict(torch.load('trt_model.pt', map_location=device))
-    model_trt.to(device)
-    model_trt.eval()
-    print(device)
-    shape = (1, 3, 480, 640)
-    benchmark(model_trt.half(), device, shape)
+    model.to(device)
+    model.eval()
+    x = torch.ones(shape).to(device)
+    trt_model = torch2trt(model, [x], fp16_mode=True)
+
+    return trt_model
 
 
 def benchmark(model, device, input_shape, dtype='fp32', nwarmup=50, nruns=1000):
+    cudnn.benchmark = True
     input_data = torch.randn(input_shape)
     input_data = input_data.to(device)
     if dtype == 'fp16':
@@ -42,7 +40,3 @@ def benchmark(model, device, input_shape, dtype='fp32', nwarmup=50, nruns=1000):
             timings.append(end_time - start_time)
             if i % 10 == 0:
                 print('Iteration %d/%d, avg batch time %.2f ms' % (i, nruns, np.mean(timings) * 1000))
-
-
-if __name__ == "__main__":
-    main()
