@@ -2,17 +2,25 @@ import cv2 as cv
 
 from time import time
 from distraction_model import WrapperDistractionModel
+from drowsiness_model import WrapperDrowsinessModel
 
 
 def main():
-    distraction_capture = cv.VideoCapture(2)
+    distraction_capture = cv.VideoCapture(0)
     distraction_model = WrapperDistractionModel()
+
+    drowsiness_capture = cv.VideoCapture(2)
+    drowsiness_model = WrapperDrowsinessModel()
+
     last_attention = time()
     while True:
-        _, frame = distraction_capture.read()
-        distraction_prediction = distraction_model.predict(frame)
-        print(distraction_prediction)
-        if distraction_prediction == 0:
+        _, distraction_frame = distraction_capture.read()
+        distracted = distraction_model.predict(distraction_frame)
+
+        _, drowsiness_frame = drowsiness_capture.read()
+        drowsy = drowsiness_model.predict(drowsiness_frame)
+
+        if not distracted and not drowsy:
             last_attention = time()
 
         else:
@@ -24,9 +32,9 @@ def main():
             elif non_attention_interval > 2:
                 print("WARNING!!!")
 
-        cv.imshow("stream", frame)
-        if cv.waitKey(1) & 0xFF == ord('q'):
-            break
+        # cv.imshow("stream", drowsiness_frame)
+        # if cv.waitKey(1) & 0xFF == ord('q'):
+        #     break
 
 
 if __name__ == "__main__":
