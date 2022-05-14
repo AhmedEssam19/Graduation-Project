@@ -1,3 +1,5 @@
+import sys
+
 import cv2 as cv
 
 from time import time
@@ -6,10 +8,10 @@ from drowsiness_model import WrapperDrowsinessModel
 
 
 def main():
-    distraction_capture = cv.VideoCapture(0)
+    distraction_capture = cv.VideoCapture(int(sys.argv[1]))
     distraction_model = WrapperDistractionModel()
 
-    drowsiness_capture = cv.VideoCapture(2)
+    drowsiness_capture = cv.VideoCapture(int(sys.argv[2]))
     drowsiness_model = WrapperDrowsinessModel()
 
     last_attention = time()
