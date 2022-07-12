@@ -5,6 +5,7 @@ import torch.backends.cudnn as cudnn
 import numpy as np
 
 from torch2trt import torch2trt, TRTModule
+from Training.model import Model
 
 
 def convert2trt(model: torch.nn.Module, shape: tuple) -> TRTModule:
@@ -40,3 +41,9 @@ def benchmark(model, device, input_shape, dtype='fp32', nwarmup=50, nruns=1000):
             timings.append(end_time - start_time)
             if i % 10 == 0:
                 print('Iteration %d/%d, avg batch time %.2f ms' % (i, nruns, np.mean(timings) * 1000))
+
+
+def pl_to_torch(ckpt_path, output_path):
+    device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+    model = Model.load_from_checkpoint(checkpoint_path=ckpt_path, map_location=device)
+    torch.save(model.state_dict(), output_path)
