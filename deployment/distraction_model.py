@@ -23,7 +23,7 @@ class WrapperDistractionModel:
     def __init__(self):
         super(WrapperDistractionModel, self).__init__()
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        input_shape = (480, 640)
+        input_shape = (500, 500)
         self.transforms = transforms.Compose([
             transforms.ToTensor(),
             transforms.Resize(input_shape),
