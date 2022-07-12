@@ -1,4 +1,5 @@
 import sys
+import can
 
 import cv2 as cv
 
@@ -13,6 +14,9 @@ def main():
 
     drowsiness_capture = cv.VideoCapture(int(sys.argv[2]))
     drowsiness_model = WrapperDrowsinessModel()
+    bus = can.Bus(channel='can0', interface='socketcan')
+    stop_msg = can.Message(arbitration_id=0x054, data=[1], is_extended_id=False)
+    cont_msg = can.Message(arbitration_id=0x054, data=[0], is_extended_id=False)
 
     last_attention = time()
     while True:
@@ -24,15 +28,18 @@ def main():
 
         if not distracted and not drowsy:
             last_attention = time()
+            bus.send(cont_msg)
 
         else:
             non_attention_interval = time() - last_attention
             print(non_attention_interval)
             if non_attention_interval > 4:
                 print("AUTO BREAK!!!!")
+                bus.send(stop_msg)
 
             elif non_attention_interval > 2:
                 print("WARNING!!!")
+                bus.send(cont_msg)
 
         # cv.imshow("stream", drowsiness_frame)
         # if cv.waitKey(1) & 0xFF == ord('q'):
