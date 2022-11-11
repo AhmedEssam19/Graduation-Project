@@ -1,9 +1,6 @@
+import torch
 from torch.utils.data import Dataset
 from torchvision.io import read_image, ImageReadMode
-
-import torchvision.transforms as transforms
-
-PATH = '../'
 
 
 class DistractionDataset(Dataset):
@@ -16,15 +13,14 @@ class DistractionDataset(Dataset):
 
     def __getitem__(self, index):
         img_path = self.df.iloc[index, 0]
-        image = read_image(PATH + img_path, mode=ImageReadMode.GRAY) / 255.0
-        image = image.repeat((3, 1, 1))
+        image = read_image(img_path, mode=ImageReadMode.RGB) / 255.0
         label = self.df.iloc[index, 1]
 
         if self.transform:
             image = self.transform(image)
 
         if self.df.iloc[index, 3] == "Camera 2":
-            image = transforms.RandomHorizontalFlip(p=1.0)(image)
+            image = torch.flip(image, dims=[1])
             if label == 4 or label == 3:
                 label -= 2
             elif label == 1 or label == 2:
