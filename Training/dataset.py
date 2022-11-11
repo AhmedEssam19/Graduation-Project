@@ -6,7 +6,7 @@ import torchvision.transforms as transforms
 PATH = '../'
 
 
-class CreateDataset(Dataset):
+class DistractionDataset(Dataset):
     def __init__(self, df, transform=None):
         self.df = df
         self.transform = transform
@@ -33,7 +33,7 @@ class CreateDataset(Dataset):
         return image, int(label)
 
 
-class ConcatDataset(Dataset):
+class CombinedDataset(Dataset):
     def __init__(self, *datasets):
         super().__init__()
         self.datasets = datasets
