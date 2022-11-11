@@ -7,8 +7,8 @@ import pytorch_lightning as pl
 
 from torch.utils.data import DataLoader
 from pytorch_lightning.loggers import WandbLogger
-from Training.model import Model
-from Training.dataset import CombinedDataset, DistractionDataset
+from training.model import Model
+from training.dataset import CombinedDataset, DistractionDataset
 
 
 PATH = './'

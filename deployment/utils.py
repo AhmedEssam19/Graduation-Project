@@ -5,7 +5,7 @@ import torch.backends.cudnn as cudnn
 import numpy as np
 
 from torch2trt import torch2trt, TRTModule
-from Training.model import Model
+from training.model import Model
 
 
 def convert2trt(model: torch.nn.Module, shape: tuple) -> TRTModule:
