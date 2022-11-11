@@ -1,0 +1,13 @@
+.idea
+*.png
+*.jpg
+*.zip
+*.h5
+*.pth
+*.ckpt
+*logs*
+wandb
+scratch.py
+__pycache__
+*.dat
+*.mp4
