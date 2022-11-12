@@ -130,7 +130,3 @@ optional arguments:
 <a href="https://github.com/ahmedessam19/Graduation-Project/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=ahmedessam19/Graduation-Project"  alt="authors"/>
 </a>
-
-<div>
-    <img src="authors.svg" alt="authors"/>
-</div>
