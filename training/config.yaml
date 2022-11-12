@@ -1,7 +1,5 @@
 program: training/train.py
 method: bayes
-entity: graduation-project
-project: Driver-Distraction
 metric:
   name: val_acc
   goal: maximize

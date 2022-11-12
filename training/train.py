@@ -16,7 +16,7 @@ def main(config):
     torch.cuda.empty_cache()
     # Initialize a new wandb run
 
-    wandb_logger = WandbLogger(project="Driver-Distraction", entity='graduation-project', config=config, log_model=True)
+    wandb_logger = WandbLogger(project=config.project, entity=config.entity, config=config, log_model=True)
 
     # prepare data
     transformers_test = transforms.Compose([
@@ -86,5 +86,9 @@ if __name__ == "__main__":
                         help='The path to the directory that contains the training, validation, and test CSV files')
     parser.add_argument('--ckpt-path', default='./checkpoints',
                         help='The path to save the model checkpoints')
+    parser.add_argument('--entity', default='graduation-project',
+                        help='The desired entity on Weights&Biases')
+    parser.add_argument('--project', default="Driver-Distraction",
+                        help='The desired project on Weights&Biases')
 
     main(parser.parse_args())
